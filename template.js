@@ -8,17 +8,24 @@
  * - John Resig - http://ejohn.org/blog/javascript-micro-templating/
  */
 
-/*jslint node: true, browser: true, evil: true, regexp: true */
+/*jslint node: true, browser: true, evil: true, regexp: true, nomen: true */
 
-var fs = require('fs');
+(function (module) {
+    'use strict';
+    
+    var fs, exports, templateFn;
 
-var template = {
-    useCache: true,
+    if (require) {
+        fs = require('fs');
+    }
     
-    cache: {},
+    exports = {
+        useCache: true,
+        cache: {}
+    };
     
-    create: function (str, data, callback) {
-        'use strict';
+    
+    templateFn = function (str, data, callback) {
         
         // Move argument around, data should be an object not a function
         if (typeof (data) === "function") {
@@ -30,21 +37,21 @@ var template = {
         // load the template - and be sure to cache the result.
         var fn;
         
-        if (!/[\t\r\n% ]/.test(str)) {
+        if (fs && str !== '' && !/[\t\r\n% ]/.test(str)) {
             if (!callback) {
-                fn = this.create(fs.readFileSync(str, { encoding: 'utf8' }), data, callback);
+                fn = templateFn(fs.readFileSync(str, { encoding: 'utf8' }), data, callback);
             } else {
                 fs.readFile(str, { encoding: 'utf8' }, function (err, contents) {
                     if (err) {
                         throw err;
                     }
-                    this.create(contents, data, callback);
+                    templateFn(contents, data, callback);
                 });
                 return;
             }
         } else {
-            if (this.useCache && this.cache[str]) {
-                fn = this.cache[str];
+            if ((data.cache || exports.useCache) && exports.cache[str]) {
+                fn = exports.cache[str];
             } else {
                 // Generate a reusable function that will serve as a template
                 // generator (and which will be cached).
@@ -53,7 +60,7 @@ var template = {
                     "obj=obj||{};" +
                     // Introduce the data as local variables using with(){}
                     "with(obj){p.push('" +
-
+                    
                     // Convert the template into pure JavaScript
                     str.split("'").join("\\'")
                     .split("\n").join("\\n")
@@ -62,22 +69,31 @@ var template = {
                     .split("<%").join("');")
                     .split("%>").join("p.push('") +
                     "');}return p.join('');");
-
-                if (this.useCache) {
-                    this.cache[str] = fn;
+                
+                if (data.cache || exports.useCache) {
+                    exports.cache[str] = fn;
                 }
             }
         }
-
+        
         // Provide some "basic" currying to the user
         if (callback) {
             callback(data ? fn(data) : fn);
         } else {
             return data ? fn(data) : fn;
         }
+    };
+    
+    exports.render = exports.__express = templateFn;
+    
+    // Backwards compatibility and semantics.
+    exports.create = templateFn;
+    
+    // Export template engine or inject it into browser window.
+    if (module) {
+        module.exports = exports;
+    } else if (window) {
+        window.template = exports;
     }
-};
-
-if (module) {
-    module.exports = template;
-}
+    
+}(module));

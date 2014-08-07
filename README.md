@@ -1,6 +1,8 @@
 # node-template
 
-Simple templating for [node.js](http://nodejs.org) based on John Resig's [JavaScript Micro-Templating](http://ejohn.org/blog/javascript-micro-templating/) and Chad Etzel's [template.node.js](http://github.com/jazzychad/template.node.js/).
+Simple templating for [node.js](http://nodejs.org/) based on John Resig's [JavaScript Micro-Templating](http://ejohn.org/blog/javascript-micro-templating/) and Chad Etzel's [template.node.js](http://github.com/jazzychad/template.node.js/).
+
+Also supports [Express](http://expressjs.com/) and any framework that follows the same view engine implementation.
 
 ## Installing
 

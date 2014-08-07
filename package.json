@@ -1,6 +1,6 @@
 {
   "name": "node-template",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Simple templating for node.js based on John Resig's JavaScript Micro-Templating and Chad Etzel's template.node.js.",
   "main": "template.js",
   "scripts": {
