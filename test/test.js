@@ -8,7 +8,7 @@ template.useCache = false;
 
 describe('node-template', function () {
     'use strict';
-    
+
     describe('basic inline', function () {
         it('should return "Hello, world."', function () {
             var result = template.create('Hello, <%= name %>.', { name: 'world' });
@@ -49,20 +49,42 @@ describe('node-template', function () {
         it('should not throw any error or exception', function () {
             assert.doesNotThrow(function () {
                 template.create(__dirname + '/complex.html');
-            }, 'failed');
+            }, Error);
         });
     });
-    
+
+    describe('errors while parsing templates', function () {
+        it('should throw an exception because of bad template', function () {
+            assert.throws(function () {
+                template.create('<% for (var i = 1; i <=  i++) {%>i%>, <% } %>START!');
+            }, Error);
+        });
+        
+        it('should throw an exception because of non-existing var', function () {
+            assert.throws(function () {
+                template.render('<% for (var i = 1; i <= count; i++) {%><%=i%>, <% } %>START!', {});
+            }, Error);
+        });
+
+        it('should return callback with error instead of throwing an exception', function () {
+            assert.doesNotThrow(function () {
+                template.render('<% for (var i = 1; i <= count; i++) {%><%=i%>, <% } %>START!', {}, function (err, result) {
+                    assert.notEqual(err, undefined, 'callback didn\'t return error');
+                });
+            });
+        });
+    });
+
     describe('wrong "this" with callback', function () {
         it('should not throw a exception', function () {
             var other = {
                 self: 'random object'
             };
             
-            template.create.apply(other, ['Hello, <%= name %>.', { name: 'world' }, function (result) {
-                assert.equal(result, 'Hello, world.');
+            template.create.apply(other, ['Hello, <%= name %>.', { name: 'world' }, function (err, html) {
+                assert.equal(html, 'Hello, world.');
             }]);
         });
     });
-    
+
 });

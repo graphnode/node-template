@@ -26,20 +26,19 @@
     
     
     templateFn = function (str, data, callback) {
-        
         // Move argument around, data should be an object not a function
         if (typeof (data) === "function") {
             callback = data;
             data = undefined;
         }
-        
+
         // Figure out if we're getting a template, or if we need to
         // load the template - and be sure to cache the result.
-        var fn, functionArgs, functionBody;
+        var fn, functionArgs, functionBody, result;
         
         if (fs && str !== '' && !/[\t\r\n% ]/.test(str)) {
             if (!callback) {
-                fn = templateFn(fs.readFileSync(str, { encoding: 'utf8' }), data, callback);
+                fn = templateFn(fs.readFileSync(str, 'utf8'), data, callback);
             } else {
                 fs.readFile(str, { encoding: 'utf8' }, function (err, contents) {
                     if (err) {
@@ -69,7 +68,16 @@
                     
                 // Generate a reusable function that will serve as a template
                 // generator (and which will be cached).
-                fn = new Function(functionArgs, functionBody);
+                try {
+                    fn = new Function(functionArgs, functionBody);
+                } catch (e1) {
+                    if (callback) {
+                        callback(e1, null);
+                        return;
+                    } else {
+                        throw e1;
+                    }
+                }
                 
                 if ((data && data.cache) || exports.useCache) {
                     exports.cache[str] = fn;
@@ -79,7 +87,14 @@
         
         // Provide some "basic" currying to the user
         if (callback) {
-            callback(data ? fn(data) : fn);
+            result = null;
+            try {
+                result = data ? fn(data) : fn;
+            } catch (e2) {
+                callback(e2, null);
+                return;
+            }
+            callback(null, result);
         } else {
             return data ? fn(data) : fn;
         }
