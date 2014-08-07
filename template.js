@@ -35,7 +35,7 @@
         
         // Figure out if we're getting a template, or if we need to
         // load the template - and be sure to cache the result.
-        var fn;
+        var fn, functionArgs, functionBody;
         
         if (fs && str !== '' && !/[\t\r\n% ]/.test(str)) {
             if (!callback) {
@@ -50,27 +50,28 @@
                 return;
             }
         } else {
-            if ((data.cache || exports.useCache) && exports.cache[str]) {
+            if (((data && data.cache) || exports.useCache) && exports.cache[str]) {
                 fn = exports.cache[str];
             } else {
-                // Generate a reusable function that will serve as a template
-                // generator (and which will be cached).
-                fn = new Function("obj",
-                    "var p=[],print=function(){p.push.apply(p,arguments);};" +
+                functionArgs = "obj";
+                functionBody = "var p=[],print=function(){p.push.apply(p,arguments);};" +
                     "obj=obj||{};" +
                     // Introduce the data as local variables using with(){}
                     "with(obj){p.push('" +
-                    
                     // Convert the template into pure JavaScript
                     str.split("'").join("\\'")
-                    .split("\n").join("\\n")
+                    .replace(/\r\n|\n/mg, '\\n')
                     .replace(/<%([\s\S]*?)%>/mg, function (m, t) { return '<%' + t.split("\\'").join("'").split("\\n").join("\n") + '%>'; })
                     .replace(/<%=(.+?)%>/g, "',$1,'")
                     .split("<%").join("');")
                     .split("%>").join("p.push('") +
-                    "');}return p.join('');");
+                    "');}return p.join('');";
+                    
+                // Generate a reusable function that will serve as a template
+                // generator (and which will be cached).
+                fn = new Function(functionArgs, functionBody);
                 
-                if (data.cache || exports.useCache) {
+                if ((data && data.cache) || exports.useCache) {
                     exports.cache[str] = fn;
                 }
             }

@@ -37,11 +37,19 @@ describe('node-template', function () {
         });
     });
     
-    describe('read template from file', function () {
+    describe('read template from basic file', function () {
         it('should return "Hello, file. 1, 2, 3, START!"', function () {
-            var tmpl = template.create(__dirname + '/test.html');
+            var tmpl = template.create(__dirname + '/basic.html');
             assert.equal(tmpl({ name: 'file', count: 3 }), 'Hello, file. 1, 2, 3, START!');
             
+        });
+    });
+    
+    describe('try parsing complex file', function () {
+        it('should not throw any error or exception', function () {
+            assert.doesNotThrow(function () {
+                template.create(__dirname + '/complex.html');
+            }, 'failed');
         });
     });
     
