@@ -3,6 +3,10 @@
 Simple templating for [node.js](http://nodejs.org) based on 
 John Resig's [JavaScript Micro-Templating](http://ejohn.org/blog/javascript-micro-templating/) and Chad Etzel's [template.node.js](http://github.com/jazzychad/template.node.js/).
 
+## Installing
+
+    npm install https://github.com/graphnode/node-template
+
 ## Templates
 
 Templates are just files with special <% %> tags (like PHP or Ruby tags) which will be replaced with passed-in data. 
@@ -37,7 +41,7 @@ Templates can also contain javascript code to be expanded.
 
     template.create(str, data, callback)
        Parameters:
-          str      - filename of template to load
+          str      - html or filename of template to load
           data     - object containing data to replace in the template
           callback - optional argument for async coding 
        Returns:
@@ -49,7 +53,7 @@ Templates can also contain javascript code to be expanded.
 
     template.create(str, callback)
        Parameters:
-          str      - filename of template to load
+          str      - html or filename of template to load
           callback - optional argument for async coding
        Returns:
           Pre-compiled/generated function to which you can pass a data object
