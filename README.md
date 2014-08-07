@@ -1,11 +1,10 @@
 # node-template
 
-Simple templating for [node.js](http://nodejs.org) based on 
-John Resig's [JavaScript Micro-Templating](http://ejohn.org/blog/javascript-micro-templating/) and Chad Etzel's [template.node.js](http://github.com/jazzychad/template.node.js/).
+Simple templating for [node.js](http://nodejs.org) based on John Resig's [JavaScript Micro-Templating](http://ejohn.org/blog/javascript-micro-templating/) and Chad Etzel's [template.node.js](http://github.com/jazzychad/template.node.js/).
 
 ## Installing
 
-    npm install https://github.com/graphnode/node-template
+    npm install git+https://github.com/graphnode/node-template.git
 
 ## Templates
 
